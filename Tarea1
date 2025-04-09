@@ -1,0 +1,75 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Clase preguntas
+class Pregunta{
+
+  private:
+    int id; // ID unico para cada pregunra
+    string tipo; // (Seleccion multiple / V o F)
+    string enunciado;
+    string respuesta_correcta;
+    string nivel_taxonomico;
+    int tiempo_estimado;
+  public:
+  Pregunta(int id, string tipo, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado);
+  void mostrar(){
+  cout << "ID: \n" << id << endl;
+  cout << "Tipo de pregunta (Seleccion Multiple / Verdadero o Falso):\n" << tipo << endl;
+  cout << "Enunciado: \n" << endl;
+  }
+};
+
+Pregunta::Pregunta(int id, string tipo, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado){
+  this->id = id;
+  this->tipo = tipo;
+  this->enunciado = enunciado;
+  this->respuesta_correcta = respuesta_correcta;
+  this->nivel_taxonomico = nivel_taxonomico;
+  this->tiempo_estimado = tiempo_estimado;
+}
+
+int main(){
+
+  Pregunta* p1 = new Pregunta(1, "Seleccion Multiple", "¿Qué es la capital de Francia?", "Paris", " ", 2);
+  p1->mostrar();
+  delete p1;  // Evita que se libere memoria innecesaria
+
+  return 0;
+}
+
+// Seleccion Multiple
+class SeleccionMultiple : public Pregunta{
+public:
+  SeleccionMultiple(int id, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado);
+void mostrar(){
+  cout << "1. Paris\n2. Londres\n3. Madrid\n4. Roma\n" << endl;
+  }
+};
+
+// Verdadero o Falso
+class VerdaderoFalso : public Pregunta{
+public:
+  VerdaderoFalso(int id, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado);
+void mostrar(){
+  cout << "1. Verdadero\n2. Falso\n" << endl;
+}
+};
+
+// Clase evaluacion
+class Evaluacion{
+ vector<Pregunta*> preguntas;
+public:
+  int id;
+  string asignatura;
+  void agregarPregunta(Pregunta* pregunta){
+    preguntas.push_back(pregunta);
+  }
+  void mostrarEvaluacion(){
+    cout << "\n---Evaluacion---\n" << endl;
+    for (Pregunta* pregunta : preguntas){
+      
+    }
+  }
+};
