@@ -1,75 +1,332 @@
 #include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
-// Clase preguntas
-class Pregunta{
+    class Pregunta{
+    private: // Atrxibutos
+        int id;
+        string tipo; // selec o VoF
+        string enunciado;
+        string r_correcta;
+        int tax;
+        float t_estimado;
+    public: // Metodos
+    Pregunta(int _id, string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo)
+    : id(_id), tipo(_tipo), enunciado(_enunciado), r_correcta(_respuesta), tax(_taxonomia), t_estimado(_tiempo) {}
 
-  private:
-    int id; // ID unico para cada pregunra
-    string tipo; // (Seleccion multiple / V o F)
-    string enunciado;
-    string respuesta_correcta;
-    string nivel_taxonomico;
-    int tiempo_estimado;
-  public:
-  Pregunta(int id, string tipo, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado);
-  void mostrar(){
-  cout << "ID: \n" << id << endl;
-  cout << "Tipo de pregunta (Seleccion Multiple / Verdadero o Falso):\n" << tipo << endl;
-  cout << "Enunciado: \n" << endl;
-  }
+    void actualizar(string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo );
+
+    // Getters para los atributos privados
+    int getId() const { return id; }
+    int getNivel() const { return tax; } 
+    string getEnunciado() const { return enunciado; }
+    string getRespuestaCorrecta() const { return r_correcta; }
+    string getTipoPregunta() const { return tipo; }
+    float getTiempo() const { return t_estimado; }
+
+    virtual void mostrar() const = 0;
+    virtual void actualizar(string _enunciado, string _respuesta, int _nivel, float _tiempo) = 0;
+    virtual string getTipo() const = 0;
+    virtual ~Pregunta() {
+        // Destructor virtual para liberar recursos si es necesario
+    }
+
+    // Setters públicos para permitir la herencia 
+    void setEnunciado(string _e) { enunciado = _e; }
+    void setRespuestaCorrecta(string _r) { r_correcta = _r; }
+    void setNivel(int _t) { tax = _t; }
+    void setTiempo(float _tiempo) { t_estimado = _tiempo; }
+
+string NombreTax() const {
+    switch(tax) {
+        case 1: return "Recordar";
+        case 2: return "Comprender";
+        case 3: return "Aplicar";
+        case 4: return "Analizar";
+        case 5: return "Evaluar";
+        case 6: return "Crear";
+        default: return "Desconocido";
+    }
+}
 };
 
-Pregunta::Pregunta(int id, string tipo, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado){
-  this->id = id;
-  this->tipo = tipo;
-  this->enunciado = enunciado;
-  this->respuesta_correcta = respuesta_correcta;
-  this->nivel_taxonomico = nivel_taxonomico;
-  this->tiempo_estimado = tiempo_estimado;
+class SeleccionMultiple : public Pregunta{
+private:
+    vector<string> opciones;
+public:
+    SeleccionMultiple(int _id, string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo, vector<string> _opciones)
+    : Pregunta(_id, _tipo, _enunciado, _respuesta, _taxonomia, _tiempo), opciones(_opciones){}
+
+    ~SeleccionMultiple() override{}
+
+void mostrar() const override { // override sirve para modificar o ampliar las funciones heredadas
+    cout << "[Seleccion Multiple] ID: " << getId()
+         << "\nTipo: " << getTipoPregunta()
+         << "\nNivel: " << getNivel() << " (" << NombreTax() << ")"
+         << "\nTiempo: " << getTiempo() << " mins"
+         << "\nEnunciado: " << getEnunciado()
+         << "\nRespuesta correcta: " << getRespuestaCorrecta()
+         << "\nOpciones: \n";
+    int contador = 1;
+    for (const auto& opcion : opciones) {
+        cout << " Opcion " << contador << ") " << opcion << "\n";
+        contador++;
+    }
+}
+
+    void actualizar(string _enunciado, string _respuesta, int _nivel, float _tiempo) override{
+        setEnunciado(_enunciado);
+        setRespuestaCorrecta(_respuesta);
+        setNivel(_nivel);
+        setTiempo(_tiempo);
+    }
+
+string getTipo() const override {
+    return "SeleccionMultiple";
+    }
+};
+
+class VeraderoFalso : public Pregunta {
+    private:
+        vector<string> opciones2;
+    public:
+    VeraderoFalso(int _id, string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo, vector<string> _opciones)
+    : Pregunta(_id, _tipo, _enunciado, _respuesta, _taxonomia, _tiempo), opciones2(_opciones){}
+
+    ~VeraderoFalso() override{}
+
+    void mostrar() const override{
+        cout << "[Verdadero o Falso] ID: " << getId()
+         << "\nTipo: " << getTipoPregunta()
+         << "\nNivel: " << getNivel() << " (" << NombreTax() << ")"
+         << "\nTiempo: " << getTiempo() << " mins"
+         << "\nEnunciado: " << getEnunciado()
+         << "\nRespuesta correcta: " << getRespuestaCorrecta()
+         << "\nOpciones: \n"; 
+        for (size_t i = 0; i < opciones2.size(); ++i) {
+            cout << "  " << char('A' + i) << ") " << opciones2[i] << endl;
+        }
+    }
+
+    void actualizar(string _enunciado, string _respuesta, int _nivel, float _tiempo) override{
+    setEnunciado(_enunciado);
+    setRespuestaCorrecta(_respuesta);
+    setNivel(_nivel);
+    setTiempo(_tiempo);
+}
+
+string getTipo() const override {
+return "VerdaderoFalso";
+}
+};
+
+void Pregunta::actualizar(string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo){
+    tipo = _tipo;
+    enunciado = _enunciado;
+    r_correcta = _respuesta;
+    tax = _taxonomia;
+    t_estimado = _tiempo;
+}
+
+class Prueba{
+    private:
+    vector<Pregunta*> preguntas;
+    int contID = 1;
+    public:
+        ~Prueba(){
+            for (auto& p : preguntas){
+                delete p;
+            }
+            preguntas.clear();
+        }
+    void agregarPreguntas();
+    void busquedaNivel();
+    void mostrarPreguntas();
+    void actualizarPreguntas();
+    void eliminarPreguntas();
+};
+
+void Prueba::busquedaNivel(){
+    int lvl;
+    cout << "Ingrese el nivel taxonomico que desea buscar: " << endl;
+    cin >> lvl;
+    bool encontrado = false;
+    for(auto& p : preguntas){
+        if(p->getNivel() == lvl){
+            p->mostrar();
+            encontrado = true;
+        }
+    }
+    if (!encontrado){
+        cout << "No se encontró ninguna pregunta para ese nivel taxonomico. " << endl;
+    }
+}
+
+void Prueba::eliminarPreguntas(){
+    if (preguntas.empty()){
+        cout << "No hay preguntas para eliminar. " << endl;
+        return;
+    }
+    int id;
+    cout << "Ingrese el ID de la pregunta a eliminar: " << endl;
+    cin >> id;
+    cin.ignore(); // Limpiar buffer
+
+    for(auto it = preguntas.begin(); it != preguntas.end(); it++){
+        if ((*it)->getId() == id ){
+            preguntas.erase(it);
+            cout << "Pregunta eliminada con exito. " << endl;
+            return;
+        }
+    }
+    cout << "Pregunta no encontrada. " << endl;
+}
+
+void Prueba::actualizarPreguntas(){
+    if (preguntas.empty()) {
+        cout << "No hay preguntas para actualizar." << endl;
+        return;
+    }
+    int id;
+    cout << "Ingrese el id de la pregunta a actualizar:" << endl;
+    cin >> id;
+    cin.ignore();
+
+    for (auto& p : preguntas){
+        if(p->getId() == id){
+            string nuevoTipo, nuevoEnunciado, nuevaRespuesta;
+            int nuevaTaxonomia;
+            float nuevoTiempo;
+            cin.ignore();
+
+            cout << "Nuevo tipo: " << endl;
+            getline(cin, nuevoTipo);
+
+            cout << "Nuevo enunciado: " << endl;
+            getline(cin, nuevoEnunciado);
+
+            cout << "Nueva respuesta correcta: " << endl;
+            getline(cin, nuevaRespuesta);
+
+            cout << "Nuevo nivel taxonomico: " << endl;
+            cin >> nuevaTaxonomia;
+
+            cout << "Nuevo tiempo estimado: " << endl;
+            cin >> nuevoTiempo;
+            cin.ignore();
+
+            p->actualizar(nuevoTipo, nuevoEnunciado, nuevaRespuesta, nuevaTaxonomia, nuevoTiempo);
+            cout << "Pregunta actualizada. " << endl;
+
+            return;
+        }
+    }
+    cout << "Pregunta no encontrada. " << endl;
+}
+
+void Prueba::mostrarPreguntas(){
+    if (preguntas.empty()){
+        cout << "La prueba no tiene preguntas. " << endl;
+        return;
+    }
+
+    cout << "-- PREGUNTAS --" << endl;
+    for(const auto& p : preguntas){
+        p->mostrar();
+    } 
+}
+
+void Prueba::agregarPreguntas(){
+    string tipo, enunciado, respuesta;
+    int taxonomia;
+    float tiempo;
+    cout << " Presione enter." << endl;
+    cin.ignore(); // Limpiar buffer
+
+    cout << " Ingrese el tipo de pregunta (1-Sel.Multiple / 2-VoF): " << endl;
+    getline(cin, tipo);
+
+    cout << " Ingrese el enunciado: " << endl;
+    getline(cin, enunciado);
+
+    cout << " Ingrese la respuesta correcta: " << endl;
+    getline(cin, respuesta);
+
+    cout << " Ingrese el nivel taxonomico: " << endl;
+    cin >> taxonomia;
+
+    cout << " Ingrese el tiempo estimado (mins): "<< endl;
+    cin >> tiempo;
+    cin.ignore();
+
+    if (tipo == "1"){
+        vector<string> opciones;
+        int cantidadOpciones;
+        cout << " Cuantas opciones desea ingresar? (minimo 2): ";
+        cin >> cantidadOpciones;
+        cin.ignore();
+
+        for(int i = 0; i < cantidadOpciones; ++i){
+            string opcion;
+            cout << " Ingrese opcion " << i + 1 << ": ";
+            getline(cin, opcion);
+            opciones.push_back(opcion);
+        }
+
+        preguntas.push_back(new SeleccionMultiple(contID, tipo, enunciado, respuesta, taxonomia, tiempo, opciones));
+
+    } else if (tipo == "2") {
+        vector<string> opciones2;
+        cout << " Se agregarán opciones por defecto: Verdadero y Falso.\n";
+        opciones2.push_back("Verdadero");
+        opciones2.push_back("Falso");
+
+        preguntas.push_back(new VeraderoFalso(contID, tipo, enunciado, respuesta, taxonomia, tiempo, opciones2));
+
+    } else {
+        cout << " Tipo de pregunta no valido. No se agrego." << endl;
+        return;
+    }
+    cout << " Pregunta con ID: " << contID << " agregada correctamente.\n";
+    contID++;
 }
 
 int main(){
 
-  Pregunta* p1 = new Pregunta(1, "Seleccion Multiple", "¿Qué es la capital de Francia?", "Paris", " ", 2);
-  p1->mostrar();
-  delete p1;  // Evita que se libere memoria innecesaria
+    Prueba prueba;
 
-  return 0;
-}
+    int opcion;
+    do{
+        cout << "\n Menu de opciones " << endl;
+        cout << "1. Agregar pregunta "<< endl;
+        cout << "2. Mostrar preguntas " << endl;
+        cout << "3. Actualizar preguntas " << endl;
+        cout << "4. Eliminar preguntas " << endl;
+        cout << "5. Busqueda por nivel taxonomico " << endl;
+        cout << "0. Salir " << endl;
+        cout << " Seleccione una opcion: "<< endl;
+        cin >> opcion;
+        cin.ignore();
 
-// Seleccion Multiple
-class SeleccionMultiple : public Pregunta{
-public:
-  SeleccionMultiple(int id, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado);
-void mostrar(){
-  cout << "1. Paris\n2. Londres\n3. Madrid\n4. Roma\n" << endl;
-  }
-};
-
-// Verdadero o Falso
-class VerdaderoFalso : public Pregunta{
-public:
-  VerdaderoFalso(int id, string enunciado, string respuesta_correcta, string nivel_taxonomico, int tiempo_estimado);
-void mostrar(){
-  cout << "1. Verdadero\n2. Falso\n" << endl;
-}
-};
-
-// Clase evaluacion
-class Evaluacion{
- vector<Pregunta*> preguntas;
-public:
-  int id;
-  string asignatura;
-  void agregarPregunta(Pregunta* pregunta){
-    preguntas.push_back(pregunta);
-  }
-  void mostrarEvaluacion(){
-    cout << "\n---Evaluacion---\n" << endl;
-    for (Pregunta* pregunta : preguntas){
-      
+        if(opcion == 1){
+            prueba.agregarPreguntas();
+        }
+        else if(opcion == 2){
+            prueba.mostrarPreguntas();
+        }
+        else if(opcion == 3){
+            prueba.actualizarPreguntas();
+        }
+        else if (opcion == 4){
+            prueba.eliminarPreguntas();
+        }
+        else if(opcion == 5){
+            prueba.busquedaNivel();
+        }
     }
-  }
-};
+    while(opcion != 0);
+
+    system("pause");
+    return 0;
+}
