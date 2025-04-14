@@ -1,0 +1,183 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Pregunta{
+    private: // Atributos
+        int id;
+        string enunciado;
+        string tipo; // selec o VoF
+        string r_correcta;
+        int tax;
+        float t_estimado;
+    public: // Metodos
+    Pregunta(int _id, string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo)
+    : id(_id), tipo(_tipo), enunciado(_enunciado), r_correcta(_respuesta), tax(_taxonomia), t_estimado(_tiempo){}
+    void actualizar(string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo );
+    
+    // Getters y setters para los atributos privados
+    int getId() const { return id; }
+    int getNivel() const { return tax; }
+    void setEnunciado(string enunciado);
+    
+    // Mostrar la pregunta 
+    void mostrar() const {
+        cout << "ID: " << id << "\nTipo: " << tipo << "\nNivel: " << tax
+        << "\nTiempo: " << t_estimado << " mins\nEnunciado: " << enunciado
+        << "\nRespuesta correcta: " << r_correcta << "\n---------------\n";
+    }
+};
+
+void Pregunta::actualizar(string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo){
+    tipo = _tipo;
+    enunciado = _enunciado;
+    r_correcta = _respuesta;
+    tax = _taxonomia;
+    t_estimado = _tiempo;
+}
+
+class Prueba{
+    private:
+    vector<Pregunta> preguntas;
+    int contID = 1;
+    public:
+    void agregarPreguntas();
+    void mostrarPreguntas();
+    void actualizarPreguntas();
+    void eliminarPreguntas();
+};
+
+void Prueba::eliminarPreguntas(){
+    if (preguntas.empty()){
+        cout << "No hay preguntas para eliminar. " << endl;
+        return;
+    }
+    int id;
+    cout << "Ingrese el ID de la pregunta a eliminar: " << endl;
+    cin >> id;
+    cin.ignore(); // Limpiar buffer
+
+    for(auto it = preguntas.begin(); it != preguntas.end(); it++){
+        if (it->getId() == id ){
+            preguntas.erase(it);
+            cout << "Pregunta eliminada con exito. " << endl;
+            return;
+        }
+    }
+    cout << "Pregunta no encontrada. " << endl;
+}
+
+void Prueba::actualizarPreguntas(){
+    if (preguntas.empty()) {
+        cout << "No hay preguntas para actualizar." << endl;
+        return;
+    }
+    int id;
+    cout << "Ingrese el id de la pregunta a actualizar:" << endl;
+    cin >> id;
+    cin.ignore();
+
+    for (auto& p : preguntas){
+        if(p.getId() == id){
+            string nuevoTipo, nuevoEnunciado, nuevaRespuesta;
+            int nuevaTaxonomia;
+            float nuevoTiempo;
+            cin.ignore();
+
+            cout << "Nuevo tipo: " << endl;
+            getline(cin, nuevoTipo);
+
+            cout << "Nuevo enunciado: " << endl;
+            getline(cin, nuevoEnunciado);
+
+            cout << "Nueva respuesta correcta: " << endl;
+            getline(cin, nuevaRespuesta);
+
+            cout << "Nuevo nivel taxonomico: " << endl;
+            cin >> nuevaTaxonomia;
+
+            cout << "Nuevo tiempo estimado: " << endl;
+            cin >> nuevoTiempo;
+            cin.ignore();
+
+            p.actualizar(nuevoTipo, nuevoEnunciado, nuevaRespuesta, nuevaTaxonomia, nuevoTiempo);
+            cout << "Pregunta actualizada. " << endl;
+            
+            return;
+        }
+    }
+    cout << "Pregunta no encontrada. " << endl;
+}
+
+void Prueba::mostrarPreguntas(){
+    if (preguntas.empty()){
+        cout << "La prueba no tiene preguntas. " << endl;
+        return;
+    }
+    cout << "-- PREGUNTAS --" << endl;
+    for(const auto& p : preguntas){
+        p.mostrar();
+    } 
+}
+
+void Prueba::agregarPreguntas(){
+    string tipo, enunciado, respuesta;
+    int taxonomia, tiempo;
+    cout << " Presione enter." << endl;
+    cin.ignore(); //Esto limpia el buffer
+
+    cout << " Ingrese el tipo de pregunta (Sel. Multiple/ V o F): " << endl;
+    getline(cin, tipo);
+
+    cout << " Ingrese el enunciado: " << endl;
+    getline(cin, enunciado);
+
+    cout << " Ingrese la respuesta correcta: " << endl;
+    getline(cin, respuesta);
+
+    cout << " Ingrese el nivel taxonomico: " << endl;
+    cin >> taxonomia;
+
+    cout << " Ingrese el tiempo estimado(Mins): "<< endl;
+    cin >> tiempo;
+
+    preguntas.push_back(Pregunta(contID, tipo, enunciado, respuesta, taxonomia, tiempo));
+    cout << " Pregunta con ID: " << contID << endl;
+    contID++;
+
+}
+int main(){
+    
+    Prueba prueba;
+    
+    int opcion;
+    do{
+        cout << " Menu de opciones " << endl;
+        cout << "1. Agregar pregunta "<< endl;
+        cout << "2. Mostrar preguntas " << endl;
+        cout << "3. Actualizar preguntas " << endl;
+        cout << "4. Eliminar preguntas" << endl;
+        cout << "0. Salir " << endl;
+        cout << " Seleccione una opcion: "<< endl;
+        cin >> opcion;
+        cin.ignore();
+
+        if(opcion == 1){
+            prueba.agregarPreguntas();
+        }
+        else if(opcion == 2){
+            prueba.mostrarPreguntas();
+        }
+        else if(opcion == 3){
+            prueba.actualizarPreguntas();
+        }
+        else if (opcion == 4){
+            prueba.eliminarPreguntas();
+        }
+
+    }
+    while(opcion != 0);
+    system("pause");
+    return 0;
+}
