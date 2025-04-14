@@ -20,14 +20,29 @@ class Pregunta{
     int getId() const { return id; }
     int getNivel() const { return tax; }
     void setEnunciado(string enunciado);
+    string NombreTax() const;
+
     
     // Mostrar la pregunta 
     void mostrar() const {
-        cout << "ID: " << id << "\nTipo: " << tipo << "\nNivel: " << tax
+        cout << "ID: " << id << "\nTipo: " << tipo << "\nNivel: " << tax << "(" << NombreTax() << ")"
         << "\nTiempo: " << t_estimado << " mins\nEnunciado: " << enunciado
         << "\nRespuesta correcta: " << r_correcta << "\n---------------\n";
     }
 };
+
+string Pregunta::NombreTax() const {
+    switch(tax) {
+        case 1: return "Recordar";
+        case 2: return "Comprender";
+        case 3: return "Aplicar";
+        case 4: return "Analizar";
+        case 5: return "Evaluar";
+        case 6: return "Crear";
+        default: return "Desconocido";
+    }
+}
+
 
 void Pregunta::actualizar(string _tipo, string _enunciado, string _respuesta, int _taxonomia, float _tiempo){
     tipo = _tipo;
@@ -44,9 +59,19 @@ class Prueba{
     public:
     void agregarPreguntas();
     void mostrarPreguntas();
+    void busquedaNivel();
     void actualizarPreguntas();
     void eliminarPreguntas();
 };
+
+void Prueba::busquedaNivel(){
+    int lvl;
+    cout << "Ingrese el nivel taxonomico que desea buscar: " << endl;
+    cin >> lvl;
+    for(auto& p : preguntas){
+        
+    }
+}
 
 void Prueba::eliminarPreguntas(){
     if (preguntas.empty()){
@@ -115,7 +140,7 @@ void Prueba::mostrarPreguntas(){
         cout << "La prueba no tiene preguntas. " << endl;
         return;
     }
-    cout << "-- PREGUNTAS --" << endl;
+    cout << "--- PREGUNTAS ---" << endl;
     for(const auto& p : preguntas){
         p.mostrar();
     } 
@@ -145,7 +170,6 @@ void Prueba::agregarPreguntas(){
     preguntas.push_back(Pregunta(contID, tipo, enunciado, respuesta, taxonomia, tiempo));
     cout << " Pregunta con ID: " << contID << endl;
     contID++;
-
 }
 int main(){
     
