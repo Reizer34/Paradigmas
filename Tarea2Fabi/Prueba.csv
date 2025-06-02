@@ -1,0 +1,5 @@
+multiple;¿Cuál es la capital de Francia?;conocimiento;30;Madrid|París|Roma|Berlín;París
+vf;El agua hierve a 100°C a nivel del mar.;comprension;20;true
+multiple;¿Cuál de los siguientes no es un lenguaje de programación?;conocimiento;25;Python|Java|HTML|C++;HTML
+vf;La energía se mide en julios.;aplicacion;15;true
+multiple;¿Cuál es el resultado de 3 + 4 * 2?;aplicacion;30;14|11|10|8;11
